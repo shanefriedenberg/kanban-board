@@ -7,3 +7,20 @@
         -moz-osx-font-smoothing: grayscale;
     }
 }
+@import "tailwindcss";
+
+@layer base {
+    html {
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+}
+
+@layer utilities {
+    .font-display {
+        font-family: 'Cal Sans', 'CalSans-SemiBold', 'Inter', sans-serif;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+    }
+}

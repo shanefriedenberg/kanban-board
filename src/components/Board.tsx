@@ -107,75 +107,98 @@ function Board({userId: _userId}: BoardProps) {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-zinc-950 text-white p-8">
-                <p>Loading tasks...</p>
+            <div className="min-h-screen bg-zinc-950 text-zinc-100 flex items-center justify-center">
+                <p className="text-zinc-500 text-sm">Loading tasks...</p>
             </div>
         )
     }
 
     if (error) {
         return (
-            <div className="min-h-screen bg-zinc-950 text-white p-8">
-                <p className="text-red-400">Error: {error}</p>
+            <div className="min-h-screen bg-zinc-950 text-zinc-100 flex items-center justify-center">
+                <p className="text-red-400 text-sm">Error: {error}</p>
             </div>
         )
     }
+
     return (
-        <div className="min-h-screen bg-zinc-950 text-white p-8">
-            <h1 className="text-3xl font-bold mb-8">My Board</h1>
-            <div className="mb-6">
-                {!isFormOpen ? (
-                    <button className="flex-1 bg-zinc-800 text-white px-3 py-2 rounded-md border border-zinc-700" onClick={() => setIsFormOpen(true)}>
-                        Add New Task
-                    </button>
-                ) : (
-                    <div className="flex gap-2">
-                        <input
-                            type="text"
-                            value={newTaskTitle}
-                            onChange={(e)=>
-                            setNewTaskTitle(e.target.value)}
-                            placeholder={"New Task..."}
-                            autoFocus
-                            className="flex-1 bg-zinc-800 text-white px-3 py-2 rounded-md border border-zinc-700"
-                        />
-                        <button onClick={handleCreateTask} className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-md">
-                            Create
-                        </button>
-                        <button onClick={() => {
-                            setIsFormOpen(false)
-                            setNewTaskTitle("")
-                        }} className="bg-zinc-700 hover:bg-zinc-600 text-white px-4 py-2 rounded-md">
-                            Cancel
-                        </button>
+        <div className="min-h-screen bg-zinc-950 text-zinc-100">
+            <header className="border-b border-zinc-800/80 bg-zinc-950/80 backdrop-blur sticky top-0 z-20">
+                <div className="max-w-7xl mx-auto px-8 py-5 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-lg bg-violet-500"></div>
+                        <h1 className="font-display text-3xl text-zinc-100">Flow</h1>
                     </div>
-                )}
-            </div>
-            <DndContext onDragEnd={handleDragEnd}>
-                <div className="grid grid-cols-4 gap-4">
-                    {COLUMNS.map((column) => {
-                        const columnTasks = tasks.filter((task) => task.status === column.id)
-                        return (
-                            <Column
-                                key={column.id}
-                                id={column.id}
-                                title={column.title}
-                                count={columnTasks.length}
-                            >
-                                {columnTasks.length === 0 ? (
-                                    <p className="text-zinc-500 text-sm">No tasks</p>
-                                ) : (
-                                    columnTasks.map((task) => (
-                                        <TaskCard key={task.id} id={task.id} title={task.title} />
-                                    ))
-                                )}
-                            </Column>
-                        )
-                    })}
+                    <div className="text-xs text-zinc-500 tabular-nums">
+                        {tasks.length} {tasks.length === 1 ? 'task' : 'tasks'}
+                    </div>
                 </div>
-            </DndContext>
+            </header>
+            <main className="max-w-7xl mx-auto px-8 py-8">
+                <div className="mb-4">
+                    {!isFormOpen ? (
+                        <button
+                            onClick={() => setIsFormOpen(true)}
+                            className="bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-zinc-300 hover:text-zinc-100 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                        >
+                            + New task
+                        </button>
+                    ) : (
+                        <div className="flex gap-2">
+                            <input
+                                type="text"
+                                value={newTaskTitle}
+                                onChange={(e) => setNewTaskTitle(e.target.value)}
+                                placeholder="New task..."
+                                autoFocus
+                                className="flex-1 bg-zinc-900 text-zinc-100 px-3 py-2 rounded-lg border border-zinc-800 focus:outline-none focus:border-zinc-700"
+                            />
+                            <button
+                                onClick={handleCreateTask}
+                                className="bg-zinc-800 hover:bg-zinc-700 text-zinc-100 px-4 py-2 rounded-lg text-sm font-medium cursor-pointer"
+                            >
+                                Create
+                            </button>
+                            <button
+                                onClick={() => {
+                                    setIsFormOpen(false)
+                                    setNewTaskTitle("")
+                                }}
+                                className="bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-zinc-400 hover:text-zinc-100 px-4 py-2 rounded-lg text-sm font-medium cursor-pointer"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    )}
+                </div>
+
+                <DndContext onDragEnd={handleDragEnd}>
+                    <div className="grid grid-cols-4 gap-4">
+                        {COLUMNS.map((column) => {
+                            const columnTasks = tasks.filter((task) => task.status === column.id)
+                            return (
+                                <Column
+                                    key={column.id}
+                                    id={column.id}
+                                    title={column.title}
+                                    count={columnTasks.length}
+                                >
+                                    {columnTasks.length === 0 ? (
+                                        <p className="text-zinc-600 text-xs">No tasks</p>
+                                    ) : (
+                                        columnTasks.map((task) => (
+                                            <TaskCard key={task.id} id={task.id} title={task.title} />
+                                        ))
+                                    )}
+                                </Column>
+                            )
+                        })}
+                    </div>
+                </DndContext>
+            </main>
         </div>
-        )
+    )
+
 
 }
     export default Board;
