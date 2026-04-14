@@ -27,6 +27,8 @@ function Board({userId: _userId}: BoardProps) {
     const [tasks, setTasks] = useState<Task[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
+    const [isFormOpen, setIsFormOpen] = useState(false)
+    const [newTaskTitle, setNewTaskTitle] = useState("")
 
     useEffect(() => {
         async function fetchTasks() {
@@ -43,9 +45,34 @@ function Board({userId: _userId}: BoardProps) {
             setLoading(false);
 
         }
-
         fetchTasks()
     }, [])
+    async function handleCreateTask(){
+            const title = newTaskTitle.trim()
+            if(!title) return
+            const {data, error} = await supabase
+                .from('tasks')
+                .insert({
+                    title,
+                    status:'todo',
+                    user_id : _userId
+                })
+                .select()
+                .single()
+        if (error) {
+            setError(error.message)
+            setNewTaskTitle("")
+            setLoading(false)
+            return
+        }
+        setTasks([...tasks, data as Task]);
+        setLoading(false);
+        }
+
+
+
+
+
 
     if (loading) {
         return (
@@ -65,6 +92,34 @@ function Board({userId: _userId}: BoardProps) {
     return (
         <div className="min-h-screen bg-slate-900 text-white p-8">
             <h1 className="text-3xl font-bold mb-8">My Board</h1>
+            <div className="mb-6">
+                {!isFormOpen ? (
+                    <button onClick={() => setIsFormOpen(true)}>
+                        Add New Task
+                    </button>
+                ) : (
+                    <div className="flex gap-2">
+                        <input
+                            type="text"
+                            value={newTaskTitle}
+                            onChange={(e)=>
+                            setNewTaskTitle(e.target.value)}
+                            placeholder={"New Task..."}
+                            autoFocus
+                            className="flex-1 bg-slate-800 text-white px-3 py-2 rounded-md border border-slate-700"
+                        />
+                        <button onClick={handleCreateTask} className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-md">
+                            Create
+                        </button>
+                        <button onClick={() => {
+                            setIsFormOpen(false)
+                            setNewTaskTitle("")
+                        }} className="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-md">
+                            Cancel
+                        </button>
+                    </div>
+                )}
+            </div>
             <div className="grid grid-cols-4 gap-4">
                 {COLUMNS.map((column) => {
                     const columnTasks = tasks.filter((task) => task.status === column.id)
