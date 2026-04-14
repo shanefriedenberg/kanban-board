@@ -1,5 +1,6 @@
 import { useEffect,useState } from 'react'
 import { supabase } from "./lib/supabase"
+import Board from "./components/Board"
 
 function App(){
     const [userId, setUserId] = useState< string | null>(null)
@@ -31,12 +32,7 @@ function App(){
         </div>)
     }
     return (
-        <div className="min-h-screen bg-slate-900 text-white flex items-center justify-center">
-            <div className="text-center">
-                <h1 className="text-4xl font-bold mb-4">Kanban incoming</h1>
-                <p className="text-slate-400 text-sm">Signed in as: {userId}</p>
-            </div>
-        </div>
+        <Board userId={userId!}/>
     )
 }
 export default App
