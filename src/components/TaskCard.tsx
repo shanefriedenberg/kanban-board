@@ -17,7 +17,7 @@ function TaskCard( {id,title} : TaskCardProps){
             style={style}
             {...attributes}
             {...listeners}
-            className={`bg-slate-700 rounded-md p-3 text-sm cursor-grab ${isDragging ? 'opacity-50' : ''}`}
+            className={`bg-zinc-700 rounded-md p-3 text-sm cursor-grab ${isDragging ? 'opacity-50' : ''}`}
         >
             {title}
         </div>

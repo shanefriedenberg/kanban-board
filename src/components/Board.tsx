@@ -107,7 +107,7 @@ function Board({userId: _userId}: BoardProps) {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-slate-900 text-white p-8">
+            <div className="min-h-screen bg-zinc-950 text-white p-8">
                 <p>Loading tasks...</p>
             </div>
         )
@@ -115,17 +115,17 @@ function Board({userId: _userId}: BoardProps) {
 
     if (error) {
         return (
-            <div className="min-h-screen bg-slate-900 text-white p-8">
+            <div className="min-h-screen bg-zinc-950 text-white p-8">
                 <p className="text-red-400">Error: {error}</p>
             </div>
         )
     }
     return (
-        <div className="min-h-screen bg-slate-900 text-white p-8">
+        <div className="min-h-screen bg-zinc-950 text-white p-8">
             <h1 className="text-3xl font-bold mb-8">My Board</h1>
             <div className="mb-6">
                 {!isFormOpen ? (
-                    <button className="flex-1 bg-slate-800 text-white px-3 py-2 rounded-md border border-slate-700" onClick={() => setIsFormOpen(true)}>
+                    <button className="flex-1 bg-zinc-800 text-white px-3 py-2 rounded-md border border-zinc-700" onClick={() => setIsFormOpen(true)}>
                         Add New Task
                     </button>
                 ) : (
@@ -137,7 +137,7 @@ function Board({userId: _userId}: BoardProps) {
                             setNewTaskTitle(e.target.value)}
                             placeholder={"New Task..."}
                             autoFocus
-                            className="flex-1 bg-slate-800 text-white px-3 py-2 rounded-md border border-slate-700"
+                            className="flex-1 bg-zinc-800 text-white px-3 py-2 rounded-md border border-zinc-700"
                         />
                         <button onClick={handleCreateTask} className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-md">
                             Create
@@ -145,7 +145,7 @@ function Board({userId: _userId}: BoardProps) {
                         <button onClick={() => {
                             setIsFormOpen(false)
                             setNewTaskTitle("")
-                        }} className="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-md">
+                        }} className="bg-zinc-700 hover:bg-zinc-600 text-white px-4 py-2 rounded-md">
                             Cancel
                         </button>
                     </div>
@@ -163,7 +163,7 @@ function Board({userId: _userId}: BoardProps) {
                                 count={columnTasks.length}
                             >
                                 {columnTasks.length === 0 ? (
-                                    <p className="text-slate-500 text-sm">No tasks</p>
+                                    <p className="text-zinc-500 text-sm">No tasks</p>
                                 ) : (
                                     columnTasks.map((task) => (
                                         <TaskCard key={task.id} id={task.id} title={task.title} />
