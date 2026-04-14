@@ -1,5 +1,9 @@
 import {useEffect, useState} from 'react'
 import {supabase} from '../lib/supabase'
+import { DndContext} from '@dnd-kit/core'
+import type{DragEndEvent} from "@dnd-kit/core";
+import Column from './Column'
+import TaskCard from './TaskCard'
 
 type Task = {
     id: string;
@@ -47,6 +51,33 @@ function Board({userId: _userId}: BoardProps) {
         }
         fetchTasks()
     }, [])
+    async function handleDragEnd(event: DragEndEvent) {
+        const {active, over} = event
+        if (!over) return
+
+        const taskId = active.id as string
+        const newStatus = over.id as Task['status']
+
+        const task = tasks.find((t) => t.id === taskId)
+        if (!task || task.status === newStatus) return
+
+        const previousTasks = tasks
+
+        setTasks(
+            tasks.map((t) =>
+                t.id === taskId ? { ...t, status: newStatus } : t
+            )
+        )
+
+        const {error} = await supabase
+            .from('tasks')
+            .update({status: newStatus})
+            .eq('id', taskId)
+        if (error) {
+            setTasks(previousTasks)
+            setError(error.message)
+        }
+    }
     async function handleCreateTask(){
             const title = newTaskTitle.trim()
             if(!title) return
@@ -94,7 +125,7 @@ function Board({userId: _userId}: BoardProps) {
             <h1 className="text-3xl font-bold mb-8">My Board</h1>
             <div className="mb-6">
                 {!isFormOpen ? (
-                    <button onClick={() => setIsFormOpen(true)}>
+                    <button className="flex-1 bg-slate-800 text-white px-3 py-2 rounded-md border border-slate-700" onClick={() => setIsFormOpen(true)}>
                         Add New Task
                     </button>
                 ) : (
@@ -120,33 +151,31 @@ function Board({userId: _userId}: BoardProps) {
                     </div>
                 )}
             </div>
-            <div className="grid grid-cols-4 gap-4">
-                {COLUMNS.map((column) => {
-                    const columnTasks = tasks.filter((task) => task.status === column.id)
-                    return (
-                        <div key={column.id} className="bg-slate-800 rounded-lg p-4">
-                            <h2 className="font-semibold mb-4 text-slate-300">
-                                {column.title} ({columnTasks.length})
-                            </h2>
-                            <div className="flex flex-col gap-2">
+            <DndContext onDragEnd={handleDragEnd}>
+                <div className="grid grid-cols-4 gap-4">
+                    {COLUMNS.map((column) => {
+                        const columnTasks = tasks.filter((task) => task.status === column.id)
+                        return (
+                            <Column
+                                key={column.id}
+                                id={column.id}
+                                title={column.title}
+                                count={columnTasks.length}
+                            >
                                 {columnTasks.length === 0 ? (
                                     <p className="text-slate-500 text-sm">No tasks</p>
                                 ) : (
                                     columnTasks.map((task) => (
-                                        <div
-                                            key={task.id}
-                                            className="bg-slate-700 rounded-md p-3 text-sm"
-                                        >
-                                            {task.title}
-                                        </div>
+                                        <TaskCard key={task.id} id={task.id} title={task.title} />
                                     ))
                                 )}
-                            </div>
-                        </div>
-                    )
-                })}
-            </div>
+                            </Column>
+                        )
+                    })}
+                </div>
+            </DndContext>
         </div>
-    )
+        )
+
 }
     export default Board;
