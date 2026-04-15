@@ -4,7 +4,8 @@ import { DndContext} from '@dnd-kit/core'
 import type{DragEndEvent} from "@dnd-kit/core";
 import Column from './Column'
 import TaskCard from './TaskCard'
-
+import SplitText from './SplitText'
+import ShinyText from "./ShinyText.tsx";
 type Task = {
     id: string;
     title: string;
@@ -26,6 +27,9 @@ const COLUMNS: { id: Task['status']; title: string }[] = [
     {id: 'done', title: 'Done'}
 
 ]
+const handleAnimationComplete = () => {
+    console.log('All letters have animated!');
+};
 
 function Board({userId: _userId}: BoardProps) {
     const [tasks, setTasks] = useState<Task[]>([])
@@ -134,17 +138,65 @@ function Board({userId: _userId}: BoardProps) {
             </div>
         )
     }
+
     return (
         <div className="min-h-screen bg-zinc-950 text-zinc-100">
             <header className="border-b border-zinc-800/80 bg-zinc-950/80 backdrop-blur sticky top-0 z-20">
                 <div className="max-w-7xl mx-auto px-8 py-5 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <div className="w-9 h-9 rounded-lg bg-violet-500"></div>
-                        <h1 className="font-display text-3xl text-zinc-100">Flow</h1>
-                        <p className="text-[10px] text-zinc-600 uppercase tracking-widest mt-1">Task board</p>
+                        <h1 className="font-display text-3xl text-zinc-100"><SplitText
+                            text="Flow"
+                            className="text-2xl font-semibold text-center"
+                            delay={50}
+                            duration={1.6}
+                            ease="power3.out"
+                            splitType="chars"
+                            from={{ opacity: 0, y: 40 }}
+                            to={{ opacity: 1, y: 0 }}
+                            threshold={0.1}
+                            rootMargin="-100px"
+                            textAlign="center"
+                            onLetterAnimationComplete={handleAnimationComplete}
+
+
+                        ></SplitText></h1>
+                        <p className="text-[10px] text-zinc-600 uppercase tracking-widest mt-1"><SplitText
+                            text="Task Board"
+                            className=""
+                            delay={50}
+                            duration={1.6}
+                            ease="power3.out"
+                            splitType="chars"
+                            from={{ opacity: 0, y: 40 }}
+                            to={{ opacity: 1, y: 0 }}
+                            threshold={0.1}
+                            rootMargin="-100px"
+                            textAlign="center"
+                            onLetterAnimationComplete={handleAnimationComplete}
+
+
+                        /></p>
                     </div>
-                    <div className="text-xs text-zinc-500 tabular-nums">
-                        {tasks.length} {tasks.length === 1 ? 'task' : 'tasks'}
+                    <div className="text-xs text-white ">
+                        <SplitText
+                            key={tasks.length}
+                            text=  {`${tasks.length} ${tasks.length === 1 ? 'task' : 'tasks'}`}
+                            className=""
+                            delay={50}
+                            duration={1.6}
+                            ease="power3.out"
+                            splitType="chars"
+                            from={{ opacity: 0, y: 40 }}
+                            to={{ opacity: 1, y: 0 }}
+                            threshold={0.1}
+                            rootMargin="-100px"
+                            textAlign="center"
+                            onLetterAnimationComplete={handleAnimationComplete}
+
+
+                        />
+
                     </div>
                 </div>
             </header>
