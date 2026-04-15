@@ -3,9 +3,10 @@ import { useDraggable } from '@dnd-kit/core'
 type TaskCardProps = {
     id: string
     title: string
+    isNew?:boolean;
 }
 
-function TaskCard({ id, title }: TaskCardProps) {
+function TaskCard({ id, title, isNew }: TaskCardProps) {
     const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({ id })
 
     const style = transform
@@ -25,6 +26,7 @@ function TaskCard({ id, title }: TaskCardProps) {
   transition-[background-color,border-color] duration-150
   hover:border-zinc-600 hover:bg-zinc-800/80
   focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/50
+  ${isNew ? 'animate-fade-in-up' : ''}
   ${isDragging ? 'opacity-40 scale-105 shadow-2xl shadow-black/50 z-50 relative' : ''}
       `}
         >

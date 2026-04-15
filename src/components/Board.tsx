@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react'
+import {useEffect, useState, useRef} from 'react'
 import {supabase} from '../lib/supabase'
 import { DndContext} from '@dnd-kit/core'
 import type{DragEndEvent} from "@dnd-kit/core";
@@ -33,6 +33,9 @@ function Board({userId: _userId}: BoardProps) {
     const [error, setError] = useState<string | null>(null)
     const [isFormOpen, setIsFormOpen] = useState(false)
     const [newTaskTitle, setNewTaskTitle] = useState("")
+    const previousTaskIdsRef = useRef<Set<string>>(new Set())
+    const [newTaskIds, setNewTaskIds] = useState<Set<string>>(new Set())
+
 
     useEffect(() => {
         async function fetchTasks() {
@@ -50,7 +53,19 @@ function Board({userId: _userId}: BoardProps) {
 
         }
         fetchTasks()
+
     }, [])
+    useEffect(() => {
+        const seen = previousTaskIdsRef.current
+        const fresh = new Set<string>()
+        tasks.forEach((task) => {
+            if (!seen.has(task.id)) {
+                fresh.add(task.id)
+            }
+        })
+        setNewTaskIds(fresh)
+        previousTaskIdsRef.current = new Set(tasks.map((t) => t.id))
+    }, [tasks])
     async function handleDragEnd(event: DragEndEvent) {
         const {active, over} = event
         if (!over) return
@@ -92,12 +107,11 @@ function Board({userId: _userId}: BoardProps) {
                 .single()
         if (error) {
             setError(error.message)
-            setNewTaskTitle("")
-            setLoading(false)
             return
         }
         setTasks([...tasks, data as Task]);
-        setLoading(false);
+        setNewTaskTitle("")
+        setIsFormOpen(false);
         }
 
 
@@ -120,7 +134,6 @@ function Board({userId: _userId}: BoardProps) {
             </div>
         )
     }
-
     return (
         <div className="min-h-screen bg-zinc-950 text-zinc-100">
             <header className="border-b border-zinc-800/80 bg-zinc-950/80 backdrop-blur sticky top-0 z-20">
@@ -128,6 +141,7 @@ function Board({userId: _userId}: BoardProps) {
                     <div className="flex items-center gap-3">
                         <div className="w-9 h-9 rounded-lg bg-violet-500"></div>
                         <h1 className="font-display text-3xl text-zinc-100">Flow</h1>
+                        <p className="text-[10px] text-zinc-600 uppercase tracking-widest mt-1">Task board</p>
                     </div>
                     <div className="text-xs text-zinc-500 tabular-nums">
                         {tasks.length} {tasks.length === 1 ? 'task' : 'tasks'}
@@ -139,7 +153,7 @@ function Board({userId: _userId}: BoardProps) {
                     {!isFormOpen ? (
                         <button
                             onClick={() => setIsFormOpen(true)}
-                            className="bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-zinc-300 hover:text-zinc-100 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                            className="bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-zinc-300 hover:text-zinc-100 px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer"
                         >
                             + New task
                         </button>
@@ -149,13 +163,21 @@ function Board({userId: _userId}: BoardProps) {
                                 type="text"
                                 value={newTaskTitle}
                                 onChange={(e) => setNewTaskTitle(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key == "Enter") handleCreateTask()
+                                    if (e.key === 'Escape') {
+                                        setIsFormOpen(false)
+                                        setNewTaskTitle("")
+                                    }
+                                }
+                            }
                                 placeholder="New task..."
                                 autoFocus
-                                className="flex-1 bg-zinc-900 text-zinc-100 px-3 py-2 rounded-lg border border-zinc-800 focus:outline-none focus:border-zinc-700"
+                                className="flex-1 bg-zinc-900 text-zinc-100 placeholder-zinc-600 px-3 py-2 rounded-lg border border-zinc-800 focus:outline-none focus:border-violet-500/60 focus:ring-2 focus:ring-violet-500/20 transition-colors text-sm"
                             />
                             <button
                                 onClick={handleCreateTask}
-                                className="bg-zinc-800 hover:bg-zinc-700 text-zinc-100 px-4 py-2 rounded-lg text-sm font-medium cursor-pointer"
+                                className="bg-violet-500 hover:bg-violet-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-lg shadow-violet-500/20 cursor-pointer"
                             >
                                 Create
                             </button>
@@ -164,7 +186,7 @@ function Board({userId: _userId}: BoardProps) {
                                     setIsFormOpen(false)
                                     setNewTaskTitle("")
                                 }}
-                                className="bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-zinc-400 hover:text-zinc-100 px-4 py-2 rounded-lg text-sm font-medium cursor-pointer"
+                                className="bg-zinc-900/50 border border-white hover:bg-zinc-800 hover:border-zinc-800/50 text-white hover:text-zinc-300 px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer"
                             >
                                 Cancel
                             </button>
@@ -173,7 +195,7 @@ function Board({userId: _userId}: BoardProps) {
                 </div>
 
                 <DndContext onDragEnd={handleDragEnd}>
-                    <div className="grid grid-cols-4 gap-4">
+                    <div className="grid grid-cols-4 gap-4 items-start">
                         {COLUMNS.map((column) => {
                             const columnTasks = tasks.filter((task) => task.status === column.id)
                             return (
@@ -182,12 +204,15 @@ function Board({userId: _userId}: BoardProps) {
                                     id={column.id}
                                     title={column.title}
                                     count={columnTasks.length}
+
                                 >
                                     {columnTasks.length === 0 ? (
-                                        <p className="text-zinc-600 text-xs">No tasks</p>
+                                        <div className="border border-dashed border-zinc-800 rounded-lg p-4 text-center">
+                                            <p className="text-zinc-600 text-xs">No tasks</p>
+                                        </div>
                                     ) : (
                                         columnTasks.map((task) => (
-                                            <TaskCard key={task.id} id={task.id} title={task.title} />
+                                            <TaskCard key={task.id} id={task.id} title={task.title} isNew={newTaskIds.has(task.id)} />
                                         ))
                                     )}
                                 </Column>

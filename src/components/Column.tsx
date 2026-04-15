@@ -15,8 +15,8 @@ function Column({id,title,count,children}: ColumnProps) {
         <div
             ref={setNodeRef}
             className={`
-        bg-zinc-900 rounded-xl p-5 border transition-colors
-        ${isOver ? 'border-cyan-400 ring-2 ring-cyan-400/30' : 'border-zinc-800'}
+    bg-zinc-900 rounded-xl p-5 border transition-colors min-h-[300px]
+    ${isOver ? 'border-violet-500 ring-2 ring-violet-500/20' : 'border-zinc-800'}
       `}
         >
             <div className="flex items-center justify-between mb-4">
