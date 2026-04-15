@@ -156,7 +156,25 @@ function Board({userId: _userId}: BoardProps) {
             <header className="border-b border-zinc-800/80 bg-zinc-950/80 backdrop-blur sticky top-0 z-20">
                 <div className="max-w-7xl mx-auto px-8 py-5 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-lg bg-violet-500"></div>
+                        <svg
+                            viewBox="0 0 40 40"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="w-9 h-9 rounded-lg bg-zinc-900 border border-zinc-800 shadow-lg shadow-violet-500/20"
+                        >
+                            {/* Flow Line */}
+                            <path
+                                d="M10 20C10 20 15 12 20 20C25 28 30 20 30 20"
+                                stroke="currentColor"
+                                strokeWidth="3"
+                                strokeLinecap="round"
+                                className="text-violet-500"
+                            />
+
+                            {/* Task Nodes */}
+                            <circle cx="10" cy="20" r="3" className="fill-zinc-500" />
+                            <circle cx="30" cy="20" r="3" className="fill-violet-400" />
+                        </svg>
                         <h1 className="font-display text-3xl text-zinc-100"><SplitText
                             text="Flow"
                             className="text-2xl font-semibold text-center"
