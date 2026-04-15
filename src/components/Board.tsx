@@ -5,7 +5,7 @@ import type{DragEndEvent} from "@dnd-kit/core";
 import Column from './Column'
 import TaskCard from './TaskCard'
 import SplitText from './SplitText'
-import ShinyText from "./ShinyText.tsx";
+
 type Task = {
     id: string;
     title: string;
@@ -39,6 +39,7 @@ function Board({userId: _userId}: BoardProps) {
     const [newTaskTitle, setNewTaskTitle] = useState("")
     const previousTaskIdsRef = useRef<Set<string>>(new Set())
     const [newTaskIds, setNewTaskIds] = useState<Set<string>>(new Set())
+    const [newDueDate, setNewDueDate] = useState("")
 
 
     useEffect(() => {
@@ -105,7 +106,8 @@ function Board({userId: _userId}: BoardProps) {
                 .insert({
                     title,
                     status:'todo',
-                    user_id : _userId
+                    user_id : _userId,
+                    due_date :newDueDate || null
                 })
                 .select()
                 .single()
@@ -115,6 +117,7 @@ function Board({userId: _userId}: BoardProps) {
         }
         setTasks([...tasks, data as Task]);
         setNewTaskTitle("")
+        setNewDueDate("")
         setIsFormOpen(false);
         }
 
@@ -220,6 +223,7 @@ function Board({userId: _userId}: BoardProps) {
                                     if (e.key === 'Escape') {
                                         setIsFormOpen(false)
                                         setNewTaskTitle("")
+                                        setNewDueDate("")
                                     }
                                 }
                             }
@@ -227,6 +231,11 @@ function Board({userId: _userId}: BoardProps) {
                                 autoFocus
                                 className="flex-1 bg-zinc-900 text-zinc-100 placeholder-zinc-600 px-3 py-2 rounded-lg border border-zinc-800 focus:outline-none focus:border-violet-500/60 focus:ring-2 focus:ring-violet-500/20 transition-colors text-sm"
                             />
+                            <input
+                                type="date"
+                                onChange={(e)=> setNewDueDate(e.target.value)}
+                                className="bg-zinc-900 text-zinc-100 px-3 py-2 rounded-lg border border-zinc-800 focus:outline-none focus:border-violet-500/60 focus:ring-2 focus:ring-violet-500/20 transition-colors text-sm"
+                                />
                             <button
                                 onClick={handleCreateTask}
                                 className="bg-violet-500 hover:bg-violet-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-lg shadow-violet-500/20 cursor-pointer"
@@ -238,7 +247,7 @@ function Board({userId: _userId}: BoardProps) {
                                     setIsFormOpen(false)
                                     setNewTaskTitle("")
                                 }}
-                                className="bg-zinc-900/50 border border-white hover:bg-zinc-800 hover:border-zinc-800/50 text-white hover:text-zinc-300 px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer"
+                                className="bg-zinc-900/50 border border-transparent hover:bg-zinc-800 hover:border-zinc-800/50 text-white hover:text-zinc-300 px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer"
                             >
                                 Cancel
                             </button>
@@ -264,7 +273,7 @@ function Board({userId: _userId}: BoardProps) {
                                         </div>
                                     ) : (
                                         columnTasks.map((task) => (
-                                            <TaskCard key={task.id} id={task.id} title={task.title} isNew={newTaskIds.has(task.id)} />
+                                            <TaskCard key={task.id} id={task.id} title={task.title} isNew={newTaskIds.has(task.id)} dueDate={task.due_date}/>
                                         ))
                                     )}
                                 </Column>
