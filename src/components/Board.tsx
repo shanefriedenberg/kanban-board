@@ -120,11 +120,19 @@ function Board({userId: _userId}: BoardProps) {
         setNewDueDate("")
         setIsFormOpen(false);
         }
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
 
-
-
-
-
+    const stats = {
+        total: tasks.length,
+        completed: tasks.filter((t) => t.status === 'done').length,
+        overdue: tasks.filter((t) => {
+            if (!t.due_date || t.status === 'done') return false
+            const due = new Date(t.due_date)
+            due.setHours(0, 0, 0, 0)
+            return due.getTime() < today.getTime()
+        }).length,
+    }
 
     if (loading) {
         return (
@@ -141,6 +149,7 @@ function Board({userId: _userId}: BoardProps) {
             </div>
         )
     }
+
 
     return (
         <div className="min-h-screen bg-zinc-950 text-zinc-100">
@@ -183,27 +192,26 @@ function Board({userId: _userId}: BoardProps) {
                     </div>
                     <div className="text-xs text-white ">
                         <SplitText
-                            key={tasks.length}
-                            text=  {`${tasks.length} ${tasks.length === 1 ? 'task' : 'tasks'}`}
+                            key={`${stats.total}-${stats.completed}-${stats.overdue}`}
+                            text={`${stats.total} Total  •  ${stats.completed} Done  •  ${stats.overdue} Overdue`}
                             className=""
-                            delay={50}
+                            delay={30}
                             duration={1.6}
                             ease="power3.out"
                             splitType="chars"
-                            from={{ opacity: 0, y: 40 }}
+                            from={{ opacity: 0, y: 20 }}
                             to={{ opacity: 1, y: 0 }}
                             threshold={0.1}
                             rootMargin="-100px"
-                            textAlign="center"
+                            textAlign="right"
                             onLetterAnimationComplete={handleAnimationComplete}
-
-
                         />
 
                     </div>
                 </div>
             </header>
             <main className="max-w-7xl mx-auto px-8 py-8">
+
                 <div className="mb-4">
                     {!isFormOpen ? (
                         <button
